@@ -1,0 +1,64 @@
+// printing single linked list in reverse order
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+void printReverse(struct Node* head) {
+    if (head == NULL) {
+        return;
+    }
+    printReverse(head->next);
+    printf("%d -> ", head->data);
+}
+
+void insertEnd(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+void printList(struct Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+   int size;
+    printf("Enter the size of the linked list: ");
+    scanf("%d", &size);
+
+    struct Node* head = NULL;
+    int data;
+
+    for (int i = 0; i < size; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &data);
+        insertEnd(&head, data);
+    }
+    printf("Original Linked List:\n");
+    printList(head);
+
+    printf("\nLinked List in Reverse Order:\n");
+    printReverse(head);
+    
+    return 0;
+}
