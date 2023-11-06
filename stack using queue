@@ -1,0 +1,180 @@
+// stack using queue
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a node in the queue
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Structure to represent a queue
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Initialize a new node with given data
+struct Node* newNode(int data) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->data = data;
+    node->next = NULL;
+    return node;
+}
+
+// Initialize a new empty queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = queue->rear = NULL;
+    return queue;
+}
+
+// Check if the queue is empty
+int isEmpty(struct Queue* queue) {
+    return (queue->front == NULL);
+}
+
+// Add an element to the rear of the queue
+void enqueue(struct Queue* queue, int data) {
+    struct Node* node = newNode(data);
+
+    if (isEmpty(queue)) {
+        queue->front = queue->rear = node;
+        return;
+    }
+
+    queue->rear->next = node;
+    queue->rear = node;
+}
+
+// Remove and return an element from the front of the queue
+int dequeue(struct Queue* queue) {
+    if (isEmpty(queue))
+        return -1;
+
+    struct Node* temp = queue->front;
+    int data = temp->data;
+
+    queue->front = queue->front->next;
+
+    if (queue->front == NULL)
+        queue->rear = NULL;
+
+    free(temp);
+
+    return data;
+}
+
+// Structure to represent a stack using two queues
+struct Stack {
+    struct Queue* queue1;
+    struct Queue* queue2;
+};
+
+// Initialize a new stack
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->queue1 = createQueue();
+    stack->queue2 = createQueue();
+    return stack;
+}
+
+// Push an element onto the stack
+void push(struct Stack* stack, int data) {
+    enqueue(stack->queue1, data);
+}
+
+// Pop an element from the stack
+int pop(struct Stack* stack) {
+    if (isEmpty(stack->queue1))
+        return -1;
+
+    while (1) {
+        int data = dequeue(stack->queue1);
+        if (isEmpty(stack->queue1))
+            return data;
+        enqueue(stack->queue2, data);
+    }
+}
+
+// Get the top element of the stack without removing it
+int top(struct Stack* stack) {
+    int data;
+    if (isEmpty(stack->queue1))
+        return -1;
+
+    while (!isEmpty(stack->queue1)) {
+        data = dequeue(stack->queue1);
+        enqueue(stack->queue2, data);
+    }
+
+    while (!isEmpty(stack->queue2)) {
+     data = dequeue(stack->queue2);
+        enqueue(stack->queue1, data);
+    }
+
+    return data;
+}
+
+int main() {
+    struct Stack* stack = createStack();
+    int element, choice;
+
+    do {
+        printf("\n1. Push 2. Pop 3. Top 4. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter element to push: ");
+                scanf("%d", &element);
+                push(stack, element);
+                break;
+            case 2:
+                element = pop(stack);
+                if (element != -1)
+                    printf("Popped element: %d\n", element);
+                else
+                    printf("Stack is empty.\n");
+                break;
+            case 3:
+                element = top(stack);
+                if (element != -1)
+                    printf("Top element: %d\n", element);
+                else
+                    printf("Stack is empty.\n");
+                break;
+            case 4:
+                // Quit
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+OUTPUT:
+
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 1
+Enter element to push: 2
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 1
+Enter element to push: 3
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 3
+Top element: 3
+
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 2
+Popped element: 3
+
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 3
+Stack is empty.
+
+1. Push 2. Pop 3. Top 4. Quit
+Enter your choice: 
